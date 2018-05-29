@@ -1,0 +1,104 @@
+<html>
+<head>
+<title>Weekly Site Report | {{ website }}</title>
+<style type="text/css">
+body {
+	background-color: white;
+	color: black;
+	font-family: Arial, sans-serif;
+}
+table {
+	border-collapse: collapse;
+	border: 1px solid rgb(150,150,150);
+}
+td, th {
+	border: 1px solid rgb(150,150,150);
+	padding: 0.3em;
+}
+h1 {
+	font-size: 1.5em;
+	margin-bottom: 0.3em;
+}
+p {
+	margin-top: 0;
+}
+</style>
+</head>
+<body>
+
+<h1>Views By Date</h1>
+<p>The number of views to any page on the site on a given day.</p>
+<table>
+	<thead>
+		<tr>
+			<th>Date</th>
+			<th>Views</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{#each viewsByDate}}
+			<tr>
+				<td>{{ date }}</td>
+				<td>{{ count }}</td>
+			</tr>
+		{{/each}}
+	</tbody>
+</table>
+
+<h1>Page Views</h1>
+<p>The number of views for a specific page over the past week.</p>
+<table>
+	<thead>
+		<tr>
+			<th>Page</th>
+			<th>Views</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{#each viewsByUrl}}
+			<tr>
+				<td>{{ url }}</td>
+				<td>{{ count }}</td>
+			</tr>
+		{{/each}}
+	</tbody>
+</table>
+
+<h1>Referrers</h1>
+<p>The website which the viewer came from.</p>
+<table>
+	<thead>
+		<tr>
+			<th>Referrer</th>
+			<th>Views</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{#each viewsByReferrer}}
+			<tr>
+				<td>{{ referrer }}</td>
+				<td>{{ count }}</td>
+			</tr>
+		{{/each}}
+	</tbody>
+</table>
+
+<!-- h1>Location</h1>
+<p>The geographic location of the viewer.</p>
+<table>
+	<thead>
+		<tr>
+			<th>Location</th>
+			<th>Views</th>
+		</tr>
+	</thead>
+	{{#each viewsByLocation}}
+		<tr>
+			<td>{{ location }}</td>
+			<td>{{ count }}</td>
+		</tr>
+	{{/each}}
+</table -->
+
+</body>
+</html>

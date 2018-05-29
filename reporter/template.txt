@@ -1,0 +1,33 @@
+
+Views By Date
+=============
+
+The number of views to any page on the site on a given day.
+
+Date | Views
+------------
+{{#each viewsByDate}}
+{{ date }} | {{ count }}
+{{/each}}
+
+Page Views
+==========
+
+The number of views for a specific page over the past week.
+
+Page | Views
+------------
+{{#each viewsByUrl}}
+{{ url }} | {{ count }}
+{{/each}}
+
+Referrers
+=========
+
+The website which the viewer came from.
+
+Referrer | Views
+----------------
+{{#each viewsByReferrer}}
+{{ referrer }} | {{ count }}
+{{/each}}

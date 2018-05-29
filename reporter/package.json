@@ -1,0 +1,17 @@
+{
+  "name": "reporter",
+  "version": "1.0.0",
+  "description": "AWS report generator for S3 logs.",
+  "main": "index.js",
+  "dependencies": {
+    "handlebars": "^4.0.11",
+    "moment": "^2.22.1",
+    "underscore": "^1.9.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Stoo Goff",
+  "license": "ISC"
+}
