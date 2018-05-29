@@ -18,24 +18,26 @@ let db = new AWS.DynamoDB.DocumentClient();
 let s3 = new AWS.S3();
 let ses = new AWS.SES();
 
-const params = {
-	TableName: CONFIG.table,
-	IndexName: "domain-date-index",
-	KeyConditionExpression: "#dm = :dm AND #date BETWEEN :start AND :end",
-	ExpressionAttributeNames: {
-		"#dm": "domain",
-		"#date": "date"
-	},
-	ExpressionAttributeValues: {
-		":dm": "www.hunterhoose.co.uk", // needs to be in the config
-		":start": start.format(FORMAT),
-		":end": end.format(FORMAT)
-	}
-};
-
 
 exports.handler = (event, context, callback) => {
+	const domain = event.domain;
+	const emailTo = event.emailTo;
+
 	let templates = {}, data;
+	const dbParams = {
+		TableName: CONFIG.table,
+		IndexName: "domain-date-index",
+		KeyConditionExpression: "#dm = :dm AND #date BETWEEN :start AND :end",
+		ExpressionAttributeNames: {
+			"#dm": "domain",
+			"#date": "date"
+		},
+		ExpressionAttributeValues: {
+			":dm": domain,
+			":start": start.format(FORMAT),
+			":end": end.format(FORMAT)
+		}
+	};
 
 	// set complete handler to only execute once all three AWS calls have completed
 	let complete = _.after(3, () => {
@@ -50,7 +52,7 @@ exports.handler = (event, context, callback) => {
 
 		let email = {
 			Destination: {
-				ToAddresses: ["stoo.goff@gmail.com"] // should be in config
+				ToAddresses: [emailTo]
 			},
 			Message: {
 				Body: {
@@ -65,10 +67,10 @@ exports.handler = (event, context, callback) => {
 				},
 				Subject: {
 					Charset: "UTF-8",
-					Data: "Weekly report for www.hunterhoose.co.uk"
+					Data: `Weekly report for ${domain}`
 				}
 			},
-			Source: "reports@stoogoff.com"
+			Source: CONFIG.emailFrom
 		};
 
 		ses.sendEmail(email, (err, data) => {
@@ -85,7 +87,7 @@ exports.handler = (event, context, callback) => {
 	// start all the async queries
 	s3.getObject({
 		Bucket: CONFIG.templates,
-		Key: "template.html" // this needs to have a default setting as well as a website specific setting
+		Key: "template.html"
 	}, (err, response) => {
 		if(err) {
 			console.error(err, err.stack);
@@ -98,7 +100,7 @@ exports.handler = (event, context, callback) => {
 
 	s3.getObject({
 		Bucket: CONFIG.templates,
-		Key: "template.txt" // this needs to have a default setting as well as a website specific setting
+		Key: "template.txt"
 	}, (err, response) => {
 		if(err) {
 			console.error(err, err.stack);
@@ -109,7 +111,7 @@ exports.handler = (event, context, callback) => {
 		}
 	});
 
-	db.query(params, (err, response) => {
+	db.query(dbParams, (err, response) => {
 		if(err) {
 			console.error(err, err.stack);
 		}
