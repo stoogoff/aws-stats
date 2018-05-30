@@ -9,7 +9,11 @@ module.exports = function convert(input) {
 
 	let fields = ["city", "region", "country", "country_name"];
 
-	fields.forEach(i => output[i] = { S: input[i] });
+	fields.forEach(i => {
+		if(input[i]) {
+			output[i] = { S: input[i] };
+		}
+	});
 
 	let date = new Date();
 	let month = pad(date.getMonth() + 1);

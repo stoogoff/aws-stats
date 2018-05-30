@@ -22,42 +22,49 @@ let writeTableParams = {
 exports.handler = (event, context, callback) => {
 	let need, saved;
 	let complete = _.after(2, () => {
-		let addresses = _.chain(need).difference(saved).first(50).value();
-
+		let addresses = _.difference(need, saved);
+		
+		console.log(`Have ${addresses.length} ip addresses to process.`);
+	
+		addresses = _.first(addresses, CONFIG.maxProcess);
+	
 		if(addresses.length === 0) {
 			callback();
 			return;
 		}
-
-		location.bulk(addresses, (err, data) => {
-			if(err) {
-				console.error(err, err.stacktrace);
-			}
-			else {
-				let toSend = [];
-
-				data.forEach(d => toSend.push(convert(d)));
-
-				// save to db in batches of 25
-				while(toSend.length > 0) {
-					let chunk = toSend.splice(0, 25);
+	
+		let sender = function() {
+			location.bulk(addresses.splice(0, 25), (err, data) => {
+				if(err) {
+					console.error(err, err.stacktrace);
+				}
+				else {
+					let toSend = [];
+	
+					data.forEach(d => toSend.push(convert(d)));
+	
 					let batchParams = {
 						RequestItems: {}
 					};
-
-					batchParams.RequestItems[CONFIG.writeTable] = chunk;
-
+	
+					batchParams.RequestItems[CONFIG.writeTable] = toSend;
+					
+					console.log(`Preparing to save ${toSend.length} ip addresses.`);
+	
 					writer.batchWriteItem(batchParams, (err, data) => {
 						if(err) {
 							console.error(err, err.stack);
 						}
 						else {
 							console.log(data);
+							sender();
 						}
 					});
 				}
-			}
-		});
+			});
+		};
+	
+		sender();
 	});
 
 	reader.scan(readTableParams, (err, data) => {
