@@ -43,7 +43,7 @@ exports.handler = (event, context, callback) => {
 		TableName: CONFIG.addressTable
 	};
 
-	// set complete handler to only execute once all three AWS calls have completed
+	// set complete handler to only execute once all AWS calls have completed
 	let complete = _.after(4, () => {
 		let templateParams = {
 			total          : data.length,
