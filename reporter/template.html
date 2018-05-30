@@ -19,6 +19,10 @@ h1 {
 	font-size: 1.5em;
 	margin-bottom: 0.3em;
 }
+h2 {
+	font-size: 1.3em;
+	margin-bottom: 0.3em
+}
 p {
 	margin-top: 0;
 }
@@ -42,6 +46,10 @@ p {
 				<td>{{ count }}</td>
 			</tr>
 		{{/each}}
+		<tr>
+			<td><strong>Total</strong></td>
+			<td>{{ total }}</td>
+		</tr>
 	</tbody>
 </table>
 
@@ -83,8 +91,10 @@ p {
 	</tbody>
 </table>
 
-<!-- h1>Location</h1>
+<h1>Location</h1>
 <p>The geographic location of the viewer.</p>
+
+<h2>Country</h2>
 <table>
 	<thead>
 		<tr>
@@ -92,13 +102,46 @@ p {
 			<th>Views</th>
 		</tr>
 	</thead>
-	{{#each viewsByLocation}}
+	{{#each viewsByCountry}}
 		<tr>
-			<td>{{ location }}</td>
+			<td>{{ country }}</td>
 			<td>{{ count }}</td>
 		</tr>
 	{{/each}}
-</table -->
+</table>
+
+<h2>Region (Top 10)</h2>
+<table>
+	<thead>
+		<tr>
+			<th>Location</th>
+			<th>Views</th>
+		</tr>
+	</thead>
+	{{#each viewsByRegion}}
+		<tr>
+			<td>{{ region }}</td>
+			<td>{{ count }}</td>
+		</tr>
+	{{/each}}
+</table>
+
+<h2>City (Top 10)</h2>
+<table>
+	<thead>
+		<tr>
+			<th>Location</th>
+			<th>Views</th>
+		</tr>
+	</thead>
+	{{#each viewsByCity}}
+		<tr>
+			<td>{{ city }}</td>
+			<td>{{ count }}</td>
+		</tr>
+	{{/each}}
+</table>
+
 
 </body>
 </html>

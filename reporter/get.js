@@ -1,6 +1,26 @@
 "use strict";
 
 const _ = require("underscore");
+const moment = require("moment");
+
+const FORMAT = "DD/MM/YYYY";
+
+const unknown = {
+	city: "Unknown",
+	country: "Unknown",
+	country_name: "Unknown",
+	region: "Unknown"
+};
+
+const reduce = (memo, current) => {
+	let o = current[0];
+
+	o.count = current.length;
+
+	memo.push(o);
+
+	return memo;
+};
 
 module.exports = {
 	// total views by date
@@ -15,7 +35,7 @@ module.exports = {
 			return memo;
 		}, {}).map((val, key) => {
 			return {
-				date: key,
+				date: moment(key).format(FORMAT),
 				count: val
 			};
 		}).sortBy("date").value();
@@ -28,15 +48,7 @@ module.exports = {
 				url: `${i.domain}/${i.path}`,
 				count: 0
 			}
-		}).groupBy(i => i.url).reduce((memo, current) => {
-			let o = current[0];
-
-			o.count = current.length;
-
-			memo.push(o);
-
-			return memo;
-		}, []).sortBy("count").reverse().value();
+		}).groupBy(i => i.url).reduce(reduce, []).sortBy("count").reverse().value();
 	},
 
 	viewsByReferrer(data) {
@@ -64,14 +76,33 @@ module.exports = {
 				referrer: referrer,
 				count: 0
 			};
-		}).groupBy(i => i.referrer).reduce((memo, current) => {
-			let o = current[0];
+		}).groupBy(i => i.referrer).reduce(reduce, []).sortBy("count").reverse().value();
+	},
 
-			o.count = current.length;
+	viewsByCountry(data, addresses) {
+		return _.chain(data).map(i => addresses[i.remote_address] || unknown).map(i => {
+			return {
+				country: i.country_name,
+				count: 0
+			}
+		}).groupBy(i => i.country).reduce(reduce, []).sortBy("count").reverse().value();
+	},
 
-			memo.push(o);
+	viewsByRegion(data, addresses) {
+		return _.chain(data).map(i => addresses[i.remote_address] || unknown).map(i => {
+			return {
+				region: `${i.region}, ${i.country}`,
+				count: 0
+			}
+		}).groupBy(i => i.region).reduce(reduce, []).sortBy("count").reverse().value();
+	},
 
-			return memo;
-		}, []).sortBy("count").reverse().value();
+	viewsByCity(data, addresses) {
+		return _.chain(data).map(i => addresses[i.remote_address] || unknown).map(i => {
+			return {
+				city: `${i.city}, ${i.region}, ${i.country}`,
+				count: 0
+			}
+		}).groupBy(i => i.city).reduce(reduce, []).sortBy("count").reverse().value();
 	}
 };

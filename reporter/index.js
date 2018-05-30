@@ -20,12 +20,13 @@ let ses = new AWS.SES();
 
 
 exports.handler = (event, context, callback) => {
+	console.log(event);
 	const domain = event.domain;
 	const emailTo = event.emailTo;
 
-	let templates = {}, data;
-	const dbParams = {
-		TableName: CONFIG.table,
+	let templates = {}, data, addresses = {};
+	const logParams = {
+		TableName: CONFIG.logTable,
 		IndexName: "domain-date-index",
 		KeyConditionExpression: "#dm = :dm AND #date BETWEEN :start AND :end",
 		ExpressionAttributeNames: {
@@ -38,17 +39,23 @@ exports.handler = (event, context, callback) => {
 			":end": end.format(FORMAT)
 		}
 	};
+	const addressParams = {
+		TableName: CONFIG.addressTable
+	};
 
 	// set complete handler to only execute once all three AWS calls have completed
-	let complete = _.after(3, () => {
+	let complete = _.after(4, () => {
 		let templateParams = {
-			viewsByDate    : get.viewsByDate(data.Items),
-			viewsByUrl     : get.viewsByURL(data.Items),
-			viewsByReferrer: get.viewsByReferrer(data.Items)
+			total          : data.length,
+			viewsByDate    : get.viewsByDate(data),
+			viewsByUrl     : get.viewsByURL(data),
+			viewsByReferrer: get.viewsByReferrer(data),
+			viewsByCountry : get.viewsByCountry(data, addresses),
+			viewsByRegion  : _.first(get.viewsByRegion(data, addresses), 10),
+			viewsByCity    : _.first(get.viewsByCity(data, addresses), 10)
 		};
 
 		_.each(templates, (v, k) => templates[k] = Handlebars.compile(v));
-
 
 		let email = {
 			Destination: {
@@ -111,13 +118,23 @@ exports.handler = (event, context, callback) => {
 		}
 	});
 
-	db.query(dbParams, (err, response) => {
+	db.query(logParams, (err, response) => {
 		if(err) {
 			console.error(err, err.stack);
 		}
 		else {
-			data = response;
+			data = response.Items;
 			complete();
 		}
 	});
+
+	db.scan(addressParams, (err, data) => {
+		if(err) {
+			console.error(err, err.stack);
+		}
+		else {
+			_.each(data.Items, i => addresses[i.ipaddress] = i);
+			complete();
+		}
+	})
 };

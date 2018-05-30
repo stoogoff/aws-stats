@@ -31,3 +31,26 @@ Referrer | Views
 {{#each viewsByReferrer}}
 {{ referrer }} | {{ count }}
 {{/each}}
+
+Location
+========
+
+The geographic location of the viewer.
+
+Country | Views
+---------------
+{{#each viewsByCountry}}
+{{ country }} | {{ count }}
+{{/each}}
+
+Region | Views (Top 10)
+-----------------------
+{{#each viewsByRegion}}
+{{ country }} | {{ count }}
+{{/each}}
+
+City | Views (Top 10)
+---------------------
+{{#each viewsByCity}}
+{{ country }} | {{ count }}
+{{/each}}
