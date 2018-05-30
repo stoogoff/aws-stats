@@ -6,7 +6,6 @@ const _ = require("underscore");
 const location = require("./location");
 const convert = require("./convert");
 
-AWS.config.update(CONFIG);
 
 let reader = new AWS.DynamoDB.DocumentClient();
 let writer = new AWS.DynamoDB();
@@ -23,7 +22,12 @@ let writeTableParams = {
 exports.handler = (event, context, callback) => {
 	let need, saved;
 	let complete = _.after(2, () => {
-		let addresses = _.difference(need, saved);
+		let addresses = _.chain(need).difference(saved).first(50).value();
+
+		if(addresses.length === 0) {
+			callback();
+			return;
+		}
 
 		location.bulk(addresses, (err, data) => {
 			if(err) {

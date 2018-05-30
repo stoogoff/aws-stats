@@ -1,7 +1,7 @@
 "use strict";
 
 const https = require("https");
-const noop = (err, data) => {};
+const noop = (e, d) => {};
 
 
 const LOCATION = {
