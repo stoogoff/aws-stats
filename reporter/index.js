@@ -52,7 +52,7 @@ exports.handler = (event, context, callback) => {
 
 		let email = {
 			Destination: {
-				ToAddresses: [emailTo]
+				ToAddresses: emailTo
 			},
 			Message: {
 				Body: {
