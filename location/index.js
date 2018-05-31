@@ -25,14 +25,14 @@ exports.handler = (event, context, callback) => {
 		let addresses = _.difference(need, saved);
 		
 		console.log(`Have ${addresses.length} ip addresses to process.`);
-	
-		addresses = _.first(addresses, CONFIG.maxProcess);
-	
+
 		if(addresses.length === 0) {
 			callback();
 			return;
 		}
 	
+		addresses = _.first(addresses, CONFIG.maxProcess);
+
 		let sender = function() {
 			location.bulk(addresses.splice(0, 25), (err, data) => {
 				if(err) {
@@ -57,7 +57,13 @@ exports.handler = (event, context, callback) => {
 						}
 						else {
 							console.log(data);
-							sender();
+							
+							if(addresses.length > 0) {
+								sender();
+							}
+							else {
+								callback();
+							}
 						}
 					});
 				}
