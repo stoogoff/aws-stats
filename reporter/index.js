@@ -24,6 +24,8 @@ exports.handler = (event, context, callback) => {
 	const domain = event.domain;
 	const emailTo = event.emailTo;
 
+	let callback2 = _.after(2, callback);
+
 	let templates = {}, data, addresses = {};
 	const logParams = {
 		TableName: CONFIG.logTable,
@@ -57,6 +59,7 @@ exports.handler = (event, context, callback) => {
 
 		_.each(templates, (v, k) => templates[k] = Handlebars.compile(v));
 
+		let html = templates["html"](templateParams);
 		let email = {
 			Destination: {
 				ToAddresses: emailTo
@@ -69,7 +72,7 @@ exports.handler = (event, context, callback) => {
 					},
 					Html: {
 						Charset: "UTF-8",
-						Data: templates["html"](templateParams)
+						Data: html
 					}
 				},
 				Subject: {
@@ -80,12 +83,25 @@ exports.handler = (event, context, callback) => {
 			Source: CONFIG.emailFrom
 		};
 
+		s3.putObject({
+			Bucket: CONFIG.templates,
+			Key: `${domain}/${moment().format(FORMAT)}.html`,
+			Body: html
+		}, (err, data) => {
+			if(err) {
+				console.error(err, err.stack);
+			}
+			else {
+				callback2();
+			}
+		});
+
 		ses.sendEmail(email, (err, data) => {
 			if(err) {
 				console.error(err, err.stack);
 			}
 			else {
-				callback();
+				callback2();
 			}
 		});
 	});
