@@ -25,7 +25,7 @@ const reduce = (memo, current) => {
 module.exports = {
 	// total views by date
 	viewsByDate(data) {
-		return _.chain(data).map(i => i.date).reduce((memo, current) => {
+		return _.chain(data).filter(i => !i.http_status_code.startsWith("4")).map(i => i.date).reduce((memo, current) => {
 			if(!memo[current]) {
 				memo[current] = 0;
 			}
@@ -43,7 +43,7 @@ module.exports = {
 
 	// total views to a given URL in the time period
 	viewsByURL(data) {
-		return _.chain(data).map(i => {
+		return _.chain(data).filter(i => !i.http_status_code.startsWith("4")).map(i => {
 			return {
 				url: `${i.domain}/${i.path}`,
 				count: 0
@@ -52,7 +52,7 @@ module.exports = {
 	},
 
 	viewsByReferrer(data) {
-		return _.chain(data).map(i => {
+		return _.chain(data).filter(i => !i.http_status_code.startsWith("4")).map(i => {
 			let referrer = i.referrer;
 
 			if(referrer.startsWith("http")) {
@@ -80,7 +80,7 @@ module.exports = {
 	},
 
 	viewsByCountry(data, addresses) {
-		return _.chain(data).map(i => addresses[i.remote_address] || unknown).map(i => {
+		return _.chain(data).filter(i => !i.http_status_code.startsWith("4")).map(i => addresses[i.remote_address] || unknown).map(i => {
 			return {
 				country: i.country_name,
 				count: 0
@@ -89,7 +89,7 @@ module.exports = {
 	},
 
 	viewsByRegion(data, addresses) {
-		return _.chain(data).map(i => addresses[i.remote_address] || unknown).map(i => {
+		return _.chain(data).filter(i => !i.http_status_code.startsWith("4")).map(i => addresses[i.remote_address] || unknown).map(i => {
 			return {
 				region: `${i.region}, ${i.country}`,
 				count: 0
@@ -98,7 +98,7 @@ module.exports = {
 	},
 
 	viewsByCity(data, addresses) {
-		return _.chain(data).map(i => addresses[i.remote_address] || unknown).map(i => {
+		return _.chain(data).filter(i => !i.http_status_code.startsWith("4")).map(i => addresses[i.remote_address] || unknown).map(i => {
 			return {
 				city: `${i.city}, ${i.region}, ${i.country}`,
 				count: 0

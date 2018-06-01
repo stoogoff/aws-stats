@@ -11,8 +11,9 @@ const FORMAT = "YYYY-MM-DD";
 
 
 // set up database and params for query
-let end = moment().subtract(1, "days");
-let start = moment().subtract(7, "days");
+let now = moment().date();
+let end = moment().date(now - 1);
+let start = moment().date(now - 7);
 let db = new AWS.DynamoDB.DocumentClient();
 let s3 = new AWS.S3();
 let ses = new AWS.SES();
@@ -47,7 +48,7 @@ exports.handler = (event, context, callback) => {
 	// set complete handler to only execute once all AWS calls have completed
 	let complete = _.after(4, () => {
 		let templateParams = {
-			total          : data.length,
+			total          : _.filter(data, i => !i.http_status_code.startsWith("4")).length,
 			viewsByDate    : get.viewsByDate(data),
 			viewsByUrl     : get.viewsByURL(data),
 			viewsByReferrer: get.viewsByReferrer(data),
