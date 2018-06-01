@@ -1,0 +1,15 @@
+{
+  "name": "cleaner",
+  "version": "1.0.0",
+  "description": "Deletes old records from an AWS DynamoDB.",
+  "main": "index.js",
+  "dependencies": {
+    "moment": "^2.22.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Stoo Goff",
+  "license": "ISC"
+}
