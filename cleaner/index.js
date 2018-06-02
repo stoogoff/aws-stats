@@ -1,7 +1,5 @@
 "use strict";
 
-// remove by age
-
 const AWS = require("aws-sdk");
 const CONFIG = require("./aws.json");
 const moment = require("moment");
