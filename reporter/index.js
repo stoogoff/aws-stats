@@ -11,9 +11,8 @@ const FORMAT = "YYYY-MM-DD";
 
 
 // set up database and params for query
-let now = moment().date();
-let end = moment().date(now - 1);
-let start = moment().date(now - 7);
+let end = moment().subtract(1, "days");
+let start = moment().subtract(7, "days");
 let db = new AWS.DynamoDB.DocumentClient();
 let s3 = new AWS.S3();
 let ses = new AWS.SES();
@@ -139,7 +138,7 @@ exports.handler = (event, context, callback) => {
 			console.error(err, err.stack);
 		}
 		else {
-			data = response.Items;
+			data = _.chain(response.Items).groupBy(i => `${i.remote_address}+${i.date}+${i.path}+${i.http_status_code}+${i.user_agent}`).map((v, k) => v[0]).value();
 			complete();
 		}
 	});
